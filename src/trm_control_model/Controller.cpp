@@ -130,31 +130,32 @@ Controller::initUtterance(std::ostream& trmParamStream)
 	eventList_.setRadiusCoef(trmConfig_.radiusCoef);
 
 	trmParamStream <<
-		trmConfig_.outputRate              << '\n' <<
-		trmControlModelConfig_.controlRate << '\n' <<
-		trmConfig_.volume                  << '\n' <<
-		trmConfig_.channels                << '\n' <<
-		trmConfig_.balance                 << '\n' <<
-		trmConfig_.waveform                << '\n' <<
-		trmConfig_.glottalPulseTp          << '\n' <<
-		trmConfig_.glottalPulseTnMin       << '\n' <<
-		trmConfig_.glottalPulseTnMax       << '\n' <<
-		trmConfig_.breathiness             << '\n' <<
-		trmConfig_.vtlOffset + trmConfig_.vocalTractLength << '\n' << // tube length
-		trmConfig_.temperature             << '\n' <<
-		trmConfig_.lossFactor              << '\n' <<
-		trmConfig_.apertureRadius          << '\n' <<
-		trmConfig_.mouthCoef               << '\n' <<
-		trmConfig_.noseCoef                << '\n' <<
-		trmConfig_.noseRadius[1]           << '\n' <<
-		trmConfig_.noseRadius[2]           << '\n' <<
-		trmConfig_.noseRadius[3]           << '\n' <<
-		trmConfig_.noseRadius[4]           << '\n' <<
-		trmConfig_.noseRadius[5]           << '\n' <<
-		trmConfig_.throatCutoff            << '\n' <<
-		trmConfig_.throatVol               << '\n' <<
-		trmConfig_.modulation              << '\n' <<
-		trmConfig_.mixOffset               << '\n';
+        trmConfig_.outputRate              << '\n' <<
+        trmControlModelConfig_.controlRate << '\n' <<
+        trmConfig_.channels                << '\n' <<
+        trmConfig_.balance                 << '\n' <<
+        trmConfig_.waveform                << '\n' <<
+        trmConfig_.volume                  << '\n' <<
+        trmConfig_.vtlOffset + trmConfig_.vocalTractLength << '\n' << // tube length
+        trmConfig_.referenceGlottalPitch   << '\n' <<
+        trmConfig_.glottalPulseTp          << '\n' <<
+        trmConfig_.glottalPulseTnMin       << '\n' <<
+        trmConfig_.glottalPulseTnMax       << '\n' <<
+        trmConfig_.breathiness             << '\n' <<
+        trmConfig_.lossFactor              << '\n' <<
+        trmConfig_.apertureRadius          << '\n' <<
+        trmConfig_.mouthCoef               << '\n' <<
+        trmConfig_.noseCoef                << '\n' <<
+        trmConfig_.throatVol               << '\n' <<
+        trmConfig_.throatCutoff            << '\n' <<
+        trmConfig_.noseRadius[1]           << '\n' <<
+        trmConfig_.noseRadius[2]           << '\n' <<
+        trmConfig_.noseRadius[3]           << '\n' <<
+        trmConfig_.noseRadius[4]           << '\n' <<
+        trmConfig_.noseRadius[5]           << '\n' <<
+        trmConfig_.temperature             << '\n' <<
+        trmConfig_.modulation              << '\n' <<
+        trmConfig_.mixOffset               << '\n';
 }
 
 // Chunks are separated by /c.

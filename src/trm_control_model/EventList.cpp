@@ -496,7 +496,7 @@ EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postur
 	int cont;
 	int currentType;
 	double currentValueDelta, value, lastValue;
-	double ruleSymbols[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
+	double ruleSymbols[5] = {0.0, 0.0, 0.0, 0.0, 0.0}; // {duration, beat, mark1, mark2, mark3}
 	double tempTime;
 	double targets[4];
 	Event* tempEvent = nullptr;
@@ -565,7 +565,7 @@ EventList::applyRule(const Rule& rule, const std::vector<const Posture*>& postur
 			break;
 		}
 
-		insertEvent(i, 0.0, targets[0]);
+		insertEvent(i, 0.0, targets[0]); //dim, time, value
 
 		if (cont) {
 			currentType = DIPHONE;
@@ -679,7 +679,7 @@ EventList::generateEventList()
 	std::vector<const Posture*> tempPostureList;
 	while (basePostureIndex < currentPosture_) {
 		tempPostureList.clear();
-		for (unsigned int i = 0; i < 4; i++) {
+		for (unsigned int i = 0; i < 4; i++) { // find rule fit postures as many as possible
 			unsigned int postureIndex = basePostureIndex + i;
 			if (postureIndex <= currentPosture_ && postureData_[postureIndex].posture) {
 				tempPostureList.push_back(postureData_[postureIndex].posture);
@@ -963,6 +963,24 @@ EventList::addIntonationPoint(double semitone, double offsetTime, double slope, 
 }
 
 void
+EventList::generatePosture(std::ostream& postureStream)
+{
+	// Before output articulatory info, output time stamps of all targets, in ms
+	for (int i = 0, size = list_.size(); i < size; i++){
+		if(list_[i]->flag){
+			postureStream << list_[i]->time << ' ';
+		}
+	}
+	postureStream << '\n';
+	// Then print all posture names
+	std::vector<std::string> postureNameList = getPostureNameList();
+	for (int i = 0, size=postureNameList.size(); i < size; ++i){
+		postureStream << postureNameList[i] << ' ';
+	}
+	postureStream << '\n';
+}
+
+void
 EventList::generateOutput(std::ostream& trmParamStream)
 {
 	double currentValues[36];
@@ -974,6 +992,8 @@ EventList::generateOutput(std::ostream& trmParamStream)
 		return;
 	}
 
+	// Following is just the deltas for the first valid event value, other event deltas update later
+	// CurrentDeltas = (currentValues - lastValues) / (currentTime - lastTime)
 	for (int i = 0; i < 16; i++) {
 		unsigned int j = 1;
 		while ((temp = list_[j]->getValue(i)) == GS_EVENTLIST_INVALID_EVENT_VALUE) {
@@ -1019,7 +1039,7 @@ EventList::generateOutput(std::ostream& trmParamStream)
 	}
 
 	unsigned int index = 1;
-	int currentTime = 0;
+	int currentTime = 0; // Seems measured in ms, and output points every 4ms
 	int nextTime = list_[1]->time;
 	while (index < list_.size()) {
 
@@ -1045,7 +1065,7 @@ EventList::generateOutput(std::ostream& trmParamStream)
 
 		for (int j = 0; j < 32; j++) {
 			if (currentDeltas[j]) {
-				currentValues[j] += currentDeltas[j];
+				currentValues[j] += currentDeltas[j]; //until nextTime, use deltas to update currentValues
 			}
 		}
 
@@ -1060,7 +1080,7 @@ EventList::generateOutput(std::ostream& trmParamStream)
 		}
 		currentTime += 4;
 
-		if (currentTime >= nextTime) {
+		if (currentTime >= nextTime) { // here consider output a posture, should be target
 			++index;
 			if (index == list_.size()) {
 				break;
@@ -1108,6 +1128,16 @@ EventList::clearMacroIntonation()
 			event->setValue(GS_EVENTLIST_INVALID_EVENT_VALUE, j);
 		}
 	}
+}
+
+std::vector<std::string>
+EventList::getPostureNameList()
+{
+	std::vector<std::string> postureNameList;
+	for (unsigned int i =0, size = postureData_.size(); i < size; ++i){
+		postureNameList.push_back(postureData_[i].posture->name());
+	}
+	return postureNameList;
 }
 
 void

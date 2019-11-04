@@ -311,13 +311,6 @@ Tube::parseInputStream(std::istream& in)
 		controlRate_ = Text::parseString<float>(line);
 	}
 
-	/*  GET THE MASTER VOLUME  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read master volume.");
-	} else {
-		volume_ = Text::parseString<double>(line);
-	}
-
 	/*  GET THE NUMBER OF SOUND OUTPUT CHANNELS  */
 	if (!std::getline(in, line)) {
 		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read number of sound output channels.");
@@ -337,6 +330,28 @@ Tube::parseInputStream(std::istream& in)
 		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read glottal source waveform type.");
 	} else {
 		waveform_ = Text::parseString<int>(line);
+	}
+
+	/*  GET THE MASTER VOLUME  */
+	if (!std::getline(in, line)) {
+		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read master volume.");
+	} else {
+		volume_ = Text::parseString<double>(line);
+	}
+
+	/*  GET THE NOMINAL TUBE LENGTH  */
+	if (!std::getline(in, line)) {
+		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read nominal tube length.");
+	} else {
+		length_ = Text::parseString<double>(line);
+	}
+
+	/*  GET THE NOMINAL TUBE LENGTH  */
+	if (!std::getline(in, line)) {
+		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read glotal pitch.");
+	} else {
+		double pitch = Text::parseString<double>(line);
+		//std::cout << "get glotal pitch: " << pitch << std::endl;
 	}
 
 	/*  GET THE GLOTTAL PULSE RISE TIME (tp)  */
@@ -367,20 +382,6 @@ Tube::parseInputStream(std::istream& in)
 		breathiness_ = Text::parseString<double>(line);
 	}
 
-	/*  GET THE NOMINAL TUBE LENGTH  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read nominal tube length.");
-	} else {
-		length_ = Text::parseString<double>(line);
-	}
-
-	/*  GET THE TUBE TEMPERATURE  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read tube temperature.");
-	} else {
-		temperature_ = Text::parseString<double>(line);
-	}
-
 	/*  GET THE JUNCTION LOSS FACTOR  */
 	if (!std::getline(in, line)) {
 		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read junction loss factor.");
@@ -409,6 +410,20 @@ Tube::parseInputStream(std::istream& in)
 		noseCoef_ = Text::parseString<double>(line);
 	}
 
+	/*  GET THE THROAT VOLUME  */
+	if (!std::getline(in, line)) {
+		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read throat volume.");
+	} else {
+		throatVol_ = Text::parseString<double>(line);
+	}
+	
+	/*  GET THE THROAT LOWPASS FREQUENCY CUTOFF  */
+	if (!std::getline(in, line)) {
+		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read throat lowpass filter cutoff.");
+	} else {
+		throatCutoff_ = Text::parseString<double>(line);
+	}
+
 	/*  GET THE NOSE RADII  */
 	noseRadius_[0] = 0.0;
 	for (int i = 1; i < TOTAL_NASAL_SECTIONS; i++) {
@@ -419,18 +434,11 @@ Tube::parseInputStream(std::istream& in)
 		}
 	}
 
-	/*  GET THE THROAT LOWPASS FREQUENCY CUTOFF  */
+	/*  GET THE TUBE TEMPERATURE  */
 	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read throat lowpass filter cutoff.");
+		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read tube temperature.");
 	} else {
-		throatCutoff_ = Text::parseString<double>(line);
-	}
-
-	/*  GET THE THROAT VOLUME  */
-	if (!std::getline(in, line)) {
-		THROW_EXCEPTION(TRMException, "Error in tube input parsing: Could not read throat volume.");
-	} else {
-		throatVol_ = Text::parseString<double>(line);
+		temperature_ = Text::parseString<double>(line);
 	}
 
 	/*  GET THE PULSE MODULATION OF NOISE FLAG  */

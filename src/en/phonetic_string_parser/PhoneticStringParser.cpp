@@ -270,7 +270,8 @@ PhoneticStringParser::rewrite(const TRMControlModel::Posture& nextPosture, int w
 }
 
 int
-PhoneticStringParser::parseString(const char* string)
+PhoneticStringParser::parseString(const char* string) 
+// parse string to have posture list and allign posture tempo and rule tempo with postures
 {
 	const TRMControlModel::Posture* tempPosture;
 	const TRMControlModel::Posture* tempPosture1;
