@@ -167,8 +167,10 @@ public:
 	void generateEventList();
 	void applyIntonation();
 	void applyIntonationSmooth();
+	void generatePosture(std::ostream& postureStream);
 	void generateOutput(std::ostream& trmParamStream);
 	void clearMacroIntonation();
+	std::vector<std::string> getPostureNameList();
 
 	void setUpDriftGenerator(double deviation, double sampleRate, double lowpassCutoff);
 

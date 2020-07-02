@@ -43,8 +43,10 @@ public:
 	Controller(const char* configDirPath, Model& model);
 	~Controller();
 
+	template<typename T> void synthesizePhoneticString(T& phoneticStringParser, const char* phoneticString, const char* trmParamFile, const char* postureFile, const char* outputFile);
 	template<typename T> void synthesizePhoneticString(T& phoneticStringParser, const char* phoneticString, const char* trmParamFile, const char* outputFile);
 	template<typename T> void synthesizePhoneticString(T& phoneticStringParser, const char* phoneticString, const char* trmParamFile, std::vector<float>& buffer);
+	template<typename T> void synthesizePhoneticString(T& phoneticStringParser, const char* phoneticString, std::iostream& trmParamStream, std::iostream& postureStream);
 	template<typename T> void synthesizePhoneticString(T& phoneticStringParser, const char* phoneticString, std::iostream& trmParamStream);
 	void synthesizeFromEventList(const char* trmParamFile, const char* outputFile);
 	void synthesizeFromEventList(const char* trmParamFile, std::vector<float>& buffer);
@@ -70,6 +72,7 @@ private:
 	int validPosture(const char* token);
 	void setIntonation(int intonation);
 
+	template<typename T> void synthesizePhoneticStringChunk(T& phoneticStringParser, const char* phoneticStringChunk, std::ostream& trmParamStream, std::iostream& postureStream);
 	template<typename T> void synthesizePhoneticStringChunk(T& phoneticStringParser, const char* phoneticStringChunk, std::ostream& trmParamStream);
 
 	Model& model_;
@@ -78,6 +81,24 @@ private:
 	TRM::Configuration trmConfig_;
 };
 
+template<typename T>
+void
+Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phoneticString, const char* trmParamFile, const char* postureFile, const char* outputFile)
+{
+	std::fstream trmParamStream(trmParamFile, std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
+	if (!trmParamStream) {
+		THROW_EXCEPTION(IOException, "Could not open the file " << trmParamFile << '.');
+	}
+	std::fstream postureStream(postureFile, std::ios_base::in | std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
+	if (!postureStream) {
+		THROW_EXCEPTION(IOException, "Could not open the file " << postureFile << '.');
+	}
+
+	synthesizePhoneticString(phoneticStringParser, phoneticString, trmParamStream, postureStream);
+
+	TRM::Tube trm;
+	trm.synthesizeToFile(trmParamStream, outputFile);
+}
 
 
 template<typename T>
@@ -112,6 +133,30 @@ Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phonet
 
 template<typename T>
 void
+Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phoneticString, std::iostream& trmParamStream, std::iostream& postureStream)
+{
+	int chunks = calcChunks(phoneticString);
+
+	initUtterance(trmParamStream);
+
+	int index = 0;
+	while (chunks > 0) {
+		if (Log::debugEnabled) {
+			printf("Speaking \"%s\"\n", &phoneticString[index]);
+		}
+
+		synthesizePhoneticStringChunk(phoneticStringParser, &phoneticString[index], trmParamStream, postureStream);
+
+		index += nextChunk(&phoneticString[index + 2]) + 2;
+		chunks--;
+	}
+
+	trmParamStream.seekg(0);
+	postureStream.seekg(0);
+}
+
+template<typename T>
+void
 Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phoneticString, std::iostream& trmParamStream)
 {
 	int chunks = calcChunks(phoneticString);
@@ -131,6 +176,23 @@ Controller::synthesizePhoneticString(T& phoneticStringParser, const char* phonet
 	}
 
 	trmParamStream.seekg(0);
+}
+
+template<typename T>
+void
+Controller::synthesizePhoneticStringChunk(T& phoneticStringParser, const char* phoneticStringChunk, std::ostream& trmParamStream, std::iostream& postureStream)
+{
+	eventList_.setUp();
+
+	phoneticStringParser.parseString(phoneticStringChunk);
+
+	eventList_.generateEventList();
+
+	eventList_.applyIntonation();
+	eventList_.applyIntonationSmooth();
+
+	eventList_.generatePosture(postureStream);
+	eventList_.generateOutput(trmParamStream);
 }
 
 template<typename T>
