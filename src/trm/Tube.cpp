@@ -486,11 +486,11 @@ Tube::parseInputStream(std::istream& in)
 	}
 
 	/*  DOUBLE UP THE LAST INPUT TABLE, TO HELP INTERPOLATION CALCULATIONS  */
-	if (!inputData_.empty()) {
-		std::unique_ptr<InputData> lastData(new InputData());
-		*lastData = *inputData_.back();
-		inputData_.push_back(std::move(lastData));
-	}
+	// if (!inputData_.empty()) {
+	// 	std::unique_ptr<InputData> lastData(new InputData());
+	// 	*lastData = *inputData_.back();
+	// 	inputData_.push_back(std::move(lastData));
+	// }
 }
 
 /******************************************************************************
